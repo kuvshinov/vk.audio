@@ -4,6 +4,10 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var md5 = require('md5');
+
+var nconf = require('nconf');
+nconf.use('file', {file: path.join(__dirname, 'config.json')});
 
 var index = require('./routes/index');
 var api = require('./routes/api');
@@ -21,6 +25,18 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
+
+//request interceptor for checking auth
+app.use(function(req, res, next) {
+	req.app_id = nconf.get('vk:app_id');
+	var user = checkAuth(req.cookies['vk_app_' + req.app_id])
+	if (user) {
+		req.user = user;
+		next('route');
+	} else {
+		res.render('login', { VK_APP_ID: req.app_id });
+	}
+});
 
 app.use('/', index);
 app.use('/api', api);
@@ -43,6 +59,40 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-app.VK_APP_ID = '';
+
+function checkAuth(cookieString) {
+	if (cookieString == undefined) 
+		return false;
+
+	var allowed = ['expire', 'mid', 'secret', 'sid', 'sig'];
+	var data = [];
+	cookieString.split('&', 10).forEach(function(i) {
+		var pair = i.split('=', 2);
+		if (allowed.indexOf(pair[0]) >= 0) {
+			data[pair[0]] = pair[1];
+		}
+	});
+
+	if (allowed.every(function(key) { return data[key] | false; })) 
+		return false;
+
+	var sig = '';
+	for (var key in data) {
+		if (data.hasOwnProperty(key) && key !== 'sig') {
+			sig += key + '=' + data[key];
+		}
+	}
+	sig += nconf.get('vk:secret_key');
+	sig = md5(sig);
+
+	var currentTime = (new Date()).getTime() / 1000;
+	if (sig == data['sig'] && currentTime < data['expire']) {
+		return {
+			mid: data['mid']
+		}
+	}
+
+	return false;
+}
 
 module.exports = app;

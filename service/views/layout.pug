@@ -1,7 +1,13 @@
 doctype html
 html
   head
-    title= title
+    title LTME | VK Audio Manager
     link(rel='stylesheet', href='/css/style.css')
+    block scripts
+      script(src='https://vk.com/js/api/openapi.js?142', type='text/javascript')
+      script(type='text/javascript').
+        VK.init({
+          apiId: #{VK_APP_ID}
+        });
   body
     block content

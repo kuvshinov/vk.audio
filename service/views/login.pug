@@ -1,0 +1,14 @@
+extends layout
+
+block content
+  h1 Welcome to VK Audio Manager 
+  p Before starting use our service you should signing up on vk
+  #vk_btn
+  script.
+    document.getElementById('vk_btn').onclick = function() {
+      VK.Auth.login(function(response) {
+        if (response.session) {alert('ok')} else {alert('close')}
+      });
+    };
+    VK.UI.button('vk_btn');
+

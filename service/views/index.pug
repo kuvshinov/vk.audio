@@ -1,5 +1,16 @@
 extends layout
 
 block content
-  h1 Hello
-  p Welcome #{user.mid}
+  div(ng-app="vkaudio")
+    div(ng-controller="audioController as audio")
+      #nav
+        h2 Playlists 
+        ul(class="playlists")
+          li(ng-repeat="playlist in playlists")
+            a(href="#") {{playlist.name}}
+        form(ng-submit="audio.createPlaylist()")
+          input(type="text", ng-model="newPlaylist")
+          input(type="submit", value="New")
+      #audio
+  script(src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.3/angular.min.js")
+  script(src="js/app.js")

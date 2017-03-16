@@ -6,8 +6,7 @@ var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var md5 = require('md5');
 
-var nconf = require('nconf');
-nconf.use('file', {file: path.join(__dirname, 'config.json')});
+var conf = require('./config/config.js');
 
 var index = require('./routes/index');
 var api = require('./routes/api');
@@ -28,7 +27,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 //request interceptor for checking auth
 app.use(function(req, res, next) {
-	req.app_id = nconf.get('vk:app_id');
+	req.app_id = conf.get('vk:app_id');
 	var user = checkAuth(req.cookies['vk_app_' + req.app_id])
 	if (user) {
 		req.user = user;
@@ -82,7 +81,7 @@ function checkAuth(cookieString) {
 			sig += key + '=' + data[key];
 		}
 	}
-	sig += nconf.get('vk:secret_key');
+	sig += conf.get('vk:secret_key');
 	sig = md5(sig);
 
 	var currentTime = (new Date()).getTime() / 1000;

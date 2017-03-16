@@ -7,7 +7,7 @@ block content
   script.
     document.getElementById('vk_btn').onclick = function() {
       VK.Auth.login(function(response) {
-        if (response.session) {alert('ok')} else {alert('close')}
+        if (response.session) {location.href=location.href;}
       });
     };
     VK.UI.button('vk_btn');

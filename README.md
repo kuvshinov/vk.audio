@@ -1,10 +1,16 @@
 # vk.audio
 Service for managing your vk audio
 
+#Since December 16, 2016 VK disable public api for audio files. So this project not relevant any more :(
+
 ## Configuration
-Create config.json file and put it near app.js. This file have to contains the following field:
+Create config.json file and put it near config.js in config directory. This file have to contains the following field:
 ```javascript
 {
+  "db": {
+    url: "",
+    options: {}
+  }
   "vk": {
 	 "app_id": "",
 	 "secret_key": ""
